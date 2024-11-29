@@ -35,7 +35,16 @@ def login ():
                     else:
                         password = input("\nMasukkan Password : ")
                         print("Anda bisa memilih peran yang akan dijalankan\n[1]Pembeli\n[2]Penjual")
-                        role = input("Masukkan peran : ")
+                        while(True):
+                            role = input("Masukkan peran : ")
+                            if role == 1 :
+                                role = 'Pembeli'
+                                break
+                            elif role == 2 :
+                                role = 'Penjual'
+                                break
+                            else :
+                                print('Tolong masukkan angka 1 atau 2')
                         data_baru = {'username' : username, 'password' : password, 'role' : role}
                         data_baru_df = pd.DataFrame([data_baru])  # Ubah data baru menjadi DataFrame
                         daftar_pengguna = pd.concat([daftar_pengguna.reset_index(), data_baru_df], ignore_index=True)
