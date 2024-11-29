@@ -13,20 +13,21 @@ def login ():
         pilihan = input("")
         match pilihan :
             case "1" :
-                print("\nMasukkan username : ")
-                username = input("")
-                if username in daftar_pengguna.index:
-                    while(True):
-                        print("Masukkan Password : ")
-                        password = input("")
-                        if password == daftar_pengguna.loc[username, 'password']:
-                            print('Anda berhasil masuk') #diarahkan ke program selanjutnya sesuai role
-                            break
-                        else :
-                            print('Password salah!!! Silahkan masukkan kembali')
-                else :
-                    print('Maaf, username tidak dikenali\nSilahkan coba lagi...')
-                break
+                while(True):
+                    print("\nMasukkan username : ")
+                    username = input("")
+                    if username in daftar_pengguna.index:
+                        while(True):
+                            print("Masukkan Password : ")
+                            password = input("")
+                            if password == daftar_pengguna.loc[username, 'password']:
+                                print('Anda berhasil masuk') #diarahkan ke program selanjutnya sesuai role
+                                break
+                            else :
+                                print('Password salah!!! Silahkan masukkan kembali')
+                    else :
+                        print('Maaf, username tidak dikenali\nSilahkan coba lagi...')
+                    break
             case "2" :
                 while(True):
                     username = input("\nMasukkan username : ")
