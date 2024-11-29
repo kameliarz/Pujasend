@@ -20,22 +20,26 @@ def login ():
                         print("Masukkan Password : ")
                         password = input("")
                         if password == daftar_pengguna.loc[username, 'password']:
-                            print('Anda berhasil masuk')
+                            print('Anda berhasil masuk') #diarahkan ke program selanjutnya sesuai role
                             break
                         else :
-                            print('Password salah!!!')
+                            print('Password salah!!! Silahkan masukkan kembali')
                 else :
-                    print('Maaf, username tidak dikenali')
+                    print('Maaf, username tidak dikenali\nSilahkan coba lagi...')
                 break
             case "2" :
                 while(True):
-                    print("\nMasukkan username : ")
-                    username = input("")
+                    username = input("\nMasukkan username : ")
                     if username in daftar_pengguna.index:
                         print('Maaf, username sudah ada!!!\nSilahkan masukkan username lain')
                     else:
-                        print("\nMasukkan Password : ")
-                        password = input("")
+                        password = input("\nMasukkan Password : ")
+                        print("Anda bisa memilih peran yang akan dijalankan\n[1]Pembeli\n[2]Penjual")
+                        role = input("Masukkan peran : ")
+                        data_baru = {'username' : username, 'password' : password, 'role' : role}
+                        data_baru_df = pd.DataFrame([data_baru])  # Ubah data baru menjadi DataFrame
+                        daftar_pengguna = pd.concat([daftar_pengguna.reset_index(), data_baru_df], ignore_index=True)
+                        daftar_pengguna.to_csv('DaftarPengguna.csv', index=False)
                         break
                 break
             case _ :
