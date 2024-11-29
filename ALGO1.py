@@ -6,8 +6,8 @@ def login ():
         homepage = file.read()
     print(homepage)
 
-    daftar_pengguna = pd.read_csv('DaftarPengguna.csv')
-    daftar_pengguna = daftar_pengguna.set_index("username")
+    df = pd.read_csv('DaftarPengguna.csv')
+    daftar_pengguna = df.set_index("username")
 
     while (True):
         pilihan = input("")
@@ -15,8 +15,17 @@ def login ():
             case "1" :
                 print("\nMasukkan username : ")
                 username = input("")
-                print("Masukkan Password : ")
-                password = input("")
+                if username in daftar_pengguna.index:
+                    while(True):
+                        print("Masukkan Password : ")
+                        password = input("")
+                        if password == daftar_pengguna.loc[username, 'password']:
+                            print('Anda berhasil masuk')
+                            break
+                        else :
+                            print('Password salah!!!')
+                else :
+                    print('Maaf, username tidak dikenali')
                 break
             case "2" :
                 while(True):
@@ -33,4 +42,3 @@ def login ():
                 print("Angka yang anda masukkan tidak sesuai, silahkan coba lagi\n")
 
 login()
-#tessatutuatiga
