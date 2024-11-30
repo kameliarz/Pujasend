@@ -2,7 +2,7 @@ import csv
 
 def baca_menu_dari_csv():
     try:
-        with open("menu.csv", "r") as file:
+        with open("DaftarMenu.csv", "r") as file:
             reader = csv.reader(file)
             menu = {
                 "nasi goreng" : 15000 ,
@@ -17,7 +17,7 @@ def baca_menu_dari_csv():
         return {}
 
 def simpan_menu_ke_csv():
-    with open("menu.csv", "w", newline="") as file:
+    with open("DaftarMenu.csv", "w", newline="") as file:
         writer = csv.writer(file)
         for nama_menu, harga_menu in menu.items():
             writer.writerow([nama_menu, harga_menu])
