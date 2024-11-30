@@ -2,10 +2,9 @@ import pandas as pd
 import csv
 import os # os.system('cls')
 
-username = "aliakanina"
+username = ""
 
 #================================================================================
-username = "aliakanina"
 
 def baca_menu_dari_csv():
     angka = 1
