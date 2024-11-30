@@ -2,22 +2,22 @@ import pandas as pd
 import os # os.system('cls')
 
 
-def header(isi='', lauchpage=0):
+def header(isi='', homepage=0):
     os.system('cls')
     with open('homepage.txt', 'r', encoding='utf-8') as file:
-        homepage = file.read()
-    print(homepage)
+        filetxt = file.read()
+    print(filetxt)
     width = (67-len(isi))//2
     print(" "*width+isi+" "*width)
     print('='*67)
-    if lauchpage == 1:
-        isi = "Selamat Datang di aplikasi kami! ^-^"
-        width = (67-len(isi))//2
-        print(" "*width+isi+" "*width)
-        isi = "Untuk masuk silahkan pilih opsi dibawah ini"
-        width = (67-len(isi))//2
-        print(" "*width+isi+" "*width)
-        print("[1] Log in\n[2] Sign in\n[3] Keluar")
+    if homepage == 1:
+        kalimat = "Selamat Datang di aplikasi kami! ^-^"
+        width = (67-len(kalimat))//2
+        print(" "*width+kalimat+" "*width)
+        kalimat = "Untuk masuk silahkan pilih opsi dibawah ini"
+        width = (67-len(kalimat))//2
+        print(" "*width+kalimat+" "*width)
+        print("[1] Log in\n[2] Sign in\n[0] Keluar")
         while (True):
             pilihan = input("")
             match pilihan:
@@ -27,11 +27,11 @@ def header(isi='', lauchpage=0):
                 case '2':
                     registrasi()
                     break
-                case '3':
+                case '0':
                     header('KELUAR')
-                    isi = "Terimakasih sudah menggunakan layanan kami!"
-                    width = (67-len(isi))//2
-                    print('\n'+" "*width+isi+" "*width+'\n\n'+'='*67)
+                    kalimat = "Terimakasih sudah menggunakan layanan kami!"
+                    width = (67-len(kalimat))//2
+                    print('\n'+" "*width+kalimat+" "*width+'\n\n'+'='*67)
                     break
                 case _ :
                     print('Maaf, silahkan masukkan pilihan yang tersedia.')
