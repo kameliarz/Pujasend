@@ -1,30 +1,27 @@
 import pandas as pd
 import csv
-import os # os.system('cls')
+import os
 
-username = ""
-
+username = "aliakanina"
 #================================================================================
 
-def baca_menu_dari_csv():
-    angka = 1
+def baca_menu_dari_csv(): 
     try:
         with open("DaftarMenu.csv", mode="r") as file:
             reader = csv.DictReader(file)
+            menu={}
             for row in reader:
                 if row['username_penjual'] == username:
-                    # print("Baris dibaca:", row)
                     nama_menu = row['nama_menu']
                     harga_menu = int(row['harga_menu'])
-                    print(f"{angka}. {nama_menu}\t Rp{harga_menu}")
-                    angka +=1
-                else :
-                    print("Menu masih kosong.")
+                    menu[nama_menu] = harga_menu
+            return menu
     except FileNotFoundError:
         return {}
+    
+menu = baca_menu_dari_csv()
 
 def simpan_menu_ke_csv():
-    header('Penjual > Kelola Menu > Tambah Menu')
     with open("DaftarMenu.csv", "w", newline="") as file:
         writer = csv.writer(file)
         menu = baca_menu_dari_csv()
@@ -69,12 +66,19 @@ def kelola_menu():
         if pilihan == "1":
             header('Penjual > Kelola Menu > Lihat Menu')
             print("\nDaftar Menu:")
-            baca_menu_dari_csv()
+            angka =1
+            if menu:
+                for nama_menu,harga_menu in menu.items():
+                    print(f"{angka}. {nama_menu}\t Rp{harga_menu}")
+                    angka +=1
+            else:
+                print("Menu masih kosong.")
             x = input("\nEnter untuk kembali.")
             if x == '':
                 continue
 
         elif pilihan == "2":
+            header('Penjual > Kelola Menu > Tambah Menu')
             nama_menu = input("Masukkan nama menu: ")
             if nama_menu in menu:
                 print(f"{nama_menu} sudah ada di menu.")
@@ -88,7 +92,13 @@ def kelola_menu():
                     print("Harga harus berupa angka.")
 
         elif pilihan == "3":
-            nama_menu = input("Masukkan nama menu: ")
+            if menu:
+                for nama_menu,harga_menu in menu.items():
+                    print(f"{angka}. {nama_menu}\t Rp{harga_menu}")
+                    angka +=1
+            else:
+                print("Menu masih kosong.")
+            nama_menu = input("Masukkan nama menu yang ingin diubah: ")
             if nama_menu in menu:
                 print(f"{nama_menu} sudah ada di menu.")
                 ubah = input("Apakah Anda ingin mengubah nama atau harga menu? (y untuk ya, b untuk batal): ").lower()
@@ -234,6 +244,7 @@ def header(isi='', homepage=0):
                     break
                 case '0':
                     logout()
+                    break
                 case _ :
                     print('Maaf, silahkan masukkan pilihan yang tersedia.')
 
@@ -298,4 +309,5 @@ def logout():
     width = (67-len(kalimat))//2
     print('\n'+" "*width+kalimat+" "*width+'\n\n'+'='*67)
 header('',1)
+
 
