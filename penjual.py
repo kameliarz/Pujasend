@@ -1,26 +1,18 @@
 import csv
+import pandas as pd
 
 def baca_menu_dari_csv():
     try:
-        with open("DaftarMenu.csv", "r") as file:
-            reader = csv.reader(file)
-            menu = {
-                "nasi goreng" : 15000 ,
-                "mi goreng" : 10000 ,
-                "nasi empal" : 13000 ,
-            }
-            for baris in reader:
-                nama_menu, harga_menu = baris
-                menu[nama_menu] = int(harga_menu)
-            return menu
+        df = pd.read_csv("DaftarMenu.csv", header=None, names=["Nama Menu", "Harga Menu"])
+        menu = {row["Nama Menu"]: row["Harga Menu"] for index, row in df.iterrows()}
+        return menu
     except FileNotFoundError:
         return {}
-
+    
 def simpan_menu_ke_csv():
-    with open("DaftarMenu.csv", "w", newline="") as file:
-        writer = csv.writer(file)
-        for nama_menu, harga_menu in menu.items():
-            writer.writerow([nama_menu, harga_menu])
+    df = pd.DataFrame(list(menu.items()), columns=["Nama Menu", "Harga Menu"])
+    df.to_csv("DaftarMenu.csv", index=False, header=False)
+    print("Menu berhasil disimpan ke CSV.")
 
 def baca_orderan_dari_csv():
     try:
