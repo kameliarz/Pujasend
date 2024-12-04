@@ -7,6 +7,7 @@ username = " "
 #================================================================================
 #PENJUAL
 
+
 def baca_menu_dari_csv(): 
     try:
         nama_stand = username
