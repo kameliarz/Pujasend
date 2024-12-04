@@ -279,7 +279,7 @@ def voucher():
             nama_voucher = input("\nMasukkan nama voucher yang ingin diubah: ")
             if nama_voucher in voucher["Kode Voucher"].values:
                 print(f"{nama_voucher} sudah ada di menu.")
-                ubah = input("Apakah Anda ingin mengubah nama atau harga menu? (y untuk ya, b untuk batal): ").lower()
+                ubah = input("Apakah Anda ingin mengubah nama kode voucher atau banyak diskon? (y untuk ya, b untuk batal): ").lower()
             
                 if ubah == 'y':
                     nama_baru = input("Masukkan nama baru untuk voucher: ")
@@ -321,7 +321,6 @@ def voucher():
             break 
         else:
             print("Pilihan tidak valid. Coba lagi.")
-
 
 def kelola_user_penjual():
     while True :
@@ -384,7 +383,7 @@ def kelola_user_penjual():
                 print(f"{nama_penjual} tidak ditemukan dalam daftar.")
                 input('\n(Enter untuk kembali.)')
         
-        elif pilihan == "5":
+        elif pilihan == "4":
             break
 
         else:
@@ -399,7 +398,7 @@ def admin():
             kelola_user_penjual()
         elif pilihan == "2":
             header("Admin > Lihat Orderan Masuk")
-            lihat_orderan_masuk = pd.red_csv("orderan_selesai.csv")
+            lihat_orderan_masuk = pd.read_csv("orderan_selesai.csv")
             print(lihat_orderan_masuk)
         elif pilihan == "3":
             voucher()
