@@ -2,6 +2,7 @@ import pandas as pd
 import csv
 import os
 import time
+from datetime import datetime
 
 #================================================================================
 #PENJUAL
@@ -35,9 +36,10 @@ def baca_orderan_dari_csv():
     try:
         with open("orderan.csv", "r") as file:
             reader = csv.reader(file)
+            next(reader)
             return [baris for baris in reader]
     except FileNotFoundError:
-        return []  # Jika file belum ada, kembalikan list kosong
+        return [] 
 
 def simpan_orderan_ke_csv():
     with open("orderan.csv", "w", newline="") as file:
@@ -51,7 +53,7 @@ def baca_orderan_selesai_dari_csv():
             reader = csv.reader(file)
             return [baris for baris in reader]
     except FileNotFoundError:
-        return []  # Jika file belum ada, kembalikan list kosong
+        return []  
 
 def simpan_orderan_selesai_ke_csv():
     with open("orderan_selesai.csv", "w", newline="") as file:
@@ -251,11 +253,6 @@ def penjual(username):
 #=========================================================================
 #PEMBELI
 
-import pandas as pd
-import csv
-import time
-import qrcode
-
 def baca_menu_dari_csv_pembeli():
     try:
         menu_df = pd.read_csv("stand.csv")
@@ -355,6 +352,29 @@ def tampilkan_menu(menu_df, stand):
             print(f"{idx}. {row['Nama Menu']} - Rp{row['Harga']}")
     else:
         print("Menu kosong. Tidak ada data untuk ditampilkan.")
+        
+def cetak_struk(keranjang, kecamatan, ongkir, kode_voucher, subtotal, diskon, total):
+    waktu = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print("\n" + "=" * 55)
+    print(f"{'Struk Pembelian':^55}")
+    print("=" * 55)
+    print(f"Tanggal     : {waktu}")
+    print(f"Kecamatan   : {kecamatan.capitalize()}")
+    print("-" * 55)
+    print(f"{'Nama Menu':<30}{'Qty':<6}{'Total':>15}")
+    print("-" * 55)
+    for nama_menu, data in keranjang.items():
+        print(f"{nama_menu:<30}{data['jumlah']:<6}{data['total_harga']:>15}")
+    print("-" * 55)
+    print(f"{'Subtotal':30}{'':<6}{subtotal:>15}")
+    if diskon > 0:
+        print(f"{'Diskon':<30}{'':<6}{int(diskon):>15}")
+    print(f"{'Ongkir':<30}{'':<6}{ongkir:>15}")
+    print("=" * 55)
+    print(f"{'Total':<30}{'':<6}{total:>15}")
+    print("=" * 55)
+    print(f"{'Terima Kasih Telah Berbelanja!':^55}")
+    print("=" * 55)
 
 def buat_pesanan(menu_df):
     keranjang = {}
@@ -414,6 +434,7 @@ def buat_pesanan(menu_df):
 
         simpan = input("\nKonfirmasi pesanan? (y/n): ").lower()
         if simpan == "y":
+
             # Simpan orderan dengan menambahkan Nama Stand
             for nama_menu, data in keranjang.items():
                 # Cari stand yang sesuai dengan nama_menu
@@ -440,18 +461,19 @@ def buat_pesanan(menu_df):
                     else:
                         print("Input tidak valid. Harap tekan 'enter' setelah selesai melakukan pembayaran.")
             animasi_proses()
+            cetak_struk(keranjang, kecamatan, ongkir, kode_voucher, subtotal, diskon, total)
             print("\nPesanan berhasil disimpan. Terima kasih!")
         else:
             print("Pesanan dibatalkan.")
     else:
         print("Tidak ada item yang dipesan.")
+        
 
 def pembeli():
     menu_df = baca_menu_dari_csv_pembeli()
     if menu_df.empty:
         return
     buat_pesanan(menu_df)
-
 
 #=========================================================================
 
@@ -714,7 +736,7 @@ def registrasi():
             if role == 'Penjual' :
                 penjual(username2)
             elif role == 'Pembeli':
-                # pembeli() ===========================================
+                pembeli()
                 print()
             break
 
