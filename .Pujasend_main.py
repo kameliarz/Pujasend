@@ -3,10 +3,11 @@ import csv
 import os
 import time
 import qrcode
+from datetime import datetime
 
 #================================================================================
 #PENJUAL
-
+#================================================================================
 
 def baca_menu_dari_csv(username): 
     try:
@@ -134,26 +135,99 @@ def kelola_menu(username_km):
         else:
             print("Pilihan tidak valid. Coba lagi.")
 
+def baca_data_orderan():
+    try:
+        return pd.read_csv("orderan.csv")
+    except FileNotFoundError:
+        print("File 'orderan.csv' tidak ditemukan.")
+        return pd.DataFrame(columns=["Stand", "Nama Menu", "Jumlah", "Harga", "Status"])
+
+def tampilkan_pesanan_belum_diproses(stand):
+    df = baca_data_orderan()
+    df_stand = df[(df["Stand"] == stand) & (df["Status"] == "Belum")]
+
+    if df_stand.empty:
+        print(f"\nTidak ada pesanan yang belum diproses.")
+    else:
+        print(f"\nPesanan belum diproses :")
+        for i, row in df_stand.iterrows():
+            print(f"{row['Nama Menu']} - {row['Jumlah']} pcs - Rp{row['Harga']}")
+    input("\n(Enter untuk kembali.)")
+
+def ubah_status_pesanan(stand):
+    df = baca_data_orderan()
+    df_stand = df[(df["Stand"] == stand) & (df["Status"] == "Belum")]
+
+    if df_stand.empty:
+        print(f"\nTidak ada pesanan yang belum diproses.")
+        return
+
+    print(f"\nPesanan belum diproses :")
+    for i, row in df_stand.iterrows():
+        print(f"{i}. {row['Nama Menu']} - {row['Jumlah']} pcs - Rp{row['Harga']}")
+
+    try:
+        index = int(input("\nMasukkan nomor pesanan yang ingin diubah statusnya: "))
+        if index not in df_stand.index:
+            print("Nomor pesanan tidak valid.")
+            return
+
+        df.loc[index, "Status"] = "Sudah"
+        df.to_csv("orderan.csv", index=False)
+        print(f"Status pesanan nomor {index} berhasil diubah menjadi 'Sudah'.")
+    except ValueError:
+        print("Input harus berupa angka.")
+    input("\n(Enter untuk kembali.)")
+
+def tampilkan_arsip_pesanan(stand):
+    df = baca_data_orderan()
+    df_stand = df[(df["Stand"] == stand) & (df["Status"] == "Sudah")]
+
+    if df_stand.empty:
+        print(f"\nTidak ada arsip pesanan.")
+    else:
+        print(f"\nArsip pesanan :")
+        for i, row in df_stand.iterrows():
+            print(f"{i}. {row['Nama Menu']} - {row['Jumlah']} pcs - Rp{row['Harga']}")
+    input("\n(Enter untuk kembali.)")
+
+def kelola_orderan(username_ko):
+    while True:
+        header("Penjual > Kelola Orderan")
+        print("[1] Lihat Pesanan Belum Diproses\n[2] Ubah Status Pesanan\n[3] Lihat Arsip Pesanan\n[4] Keluar")
+        pilihan = input("Masukkan opsi: ")
+        if pilihan == "1":
+            header("Penjual > Kelola Orderan > Lihat Pesanan Belum Diproses")
+            tampilkan_pesanan_belum_diproses(username_ko)
+        elif pilihan == "2":
+            header("Penjual > Kelola Orderan > Ubah Status Pesanan")
+            ubah_status_pesanan(username_ko)
+        elif pilihan == "3":
+            header("Penjual > Kelola Orderan > Lihat Arsip Pesanan")
+            tampilkan_arsip_pesanan(username_ko)
+        elif pilihan == "4":
+            break
+        else:
+            print("Pilihan tidak valid. Silakan coba lagi.")
+
 def penjual(username):
     while True:
         header("Penjual")
-        print("[1] Kelola Menu\n[2] Kelola Orderan\n[3] Lihat Laporan Penjualan\n[4] Keluar")   
+        print("[1] Kelola Menu\n[2] Kelola Orderan\n[3] Keluar")   
         pilihan = input("Masukkan opsi: ")
         if pilihan == "1":
             kelola_menu(username)
         elif pilihan == "2":
-            # kelola_orderan(username)
-            print()
+            kelola_orderan(username)
         elif pilihan == "3":
-            # lihat_laporan_penjualan(username)
-            print()
-        elif pilihan == "4":
             logout()
             break
         else:
             print("Pilihan tidak valid. Coba lagi.")
+
 #=========================================================================
 #PEMBELI
+#=========================================================================
 
 def baca_menu_dari_csv_pembeli():
     try:
@@ -234,7 +308,7 @@ def pilih_kecamatan():
             print("Kecamatan tidak tersedia. Silakan pilih antara Kaliwates, Sumbersari, atau Patrang.")
 
 def hitung_total(keranjang, ongkir, voucher_df, kode_voucher=None):
-    subtotal = sum(data["Total Harga"] for data in keranjang.values()) 
+    subtotal = sum(data["total_harga"] for data in keranjang.values()) 
     diskon = 0
     if kode_voucher:
         if kode_voucher.upper() in voucher_df["Kode Voucher"].values:
@@ -254,6 +328,29 @@ def tampilkan_menu(menu_df, stand):
             print(f"{idx}. {row['Nama Menu']} - Rp{row['Harga']}")
     else:
         print("Menu kosong. Tidak ada data untuk ditampilkan.")
+        
+def cetak_struk(keranjang, kecamatan, ongkir, kode_voucher, subtotal, diskon, total):
+    waktu = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print("\n" + "=" * 55)
+    print(f"{'Struk Pembelian':^55}")
+    print("=" * 55)
+    print(f"Tanggal     : {waktu}")
+    print(f"Kecamatan   : {kecamatan.capitalize()}")
+    print("-" * 55)
+    print(f"{'Nama Menu':<30}{'Qty':<6}{'Total':>15}")
+    print("-" * 55)
+    for nama_menu, data in keranjang.items():
+        print(f"{nama_menu:<30}{data['jumlah']:<6}{data['total_harga']:>15}")
+    print("-" * 55)
+    print(f"{'Subtotal':30}{'':<6}{subtotal:>15}")
+    if diskon > 0:
+        print(f"{'Diskon':<30}{'':<6}{int(diskon):>15}")
+    print(f"{'Ongkir':<30}{'':<6}{ongkir:>15}")
+    print("=" * 55)
+    print(f"{'Total':<30}{'':<6}{total:>15}")
+    print("=" * 55)
+    print(f"{'Terima Kasih Telah Berbelanja!':^55}")
+    print("=" * 55)
 
 def buat_pesanan(menu_df):
     keranjang = {}
@@ -268,12 +365,12 @@ def buat_pesanan(menu_df):
                 stand_menu = menu_df[menu_df["Stand"].str.lower() == stand.lower()]
                 if 1 <= pilihan_menu <= len(stand_menu):
                     nama_menu = stand_menu.iloc[pilihan_menu - 1]["Nama Menu"]
-                    harga = stand_menu.iloc[pilihan_menu - 1]["Harga"]
+                    harga = int(stand_menu.iloc[pilihan_menu - 1]["Harga"])
                     jumlah = int(input(f"Masukkan jumlah {nama_menu}: "))
 
                     if nama_menu in keranjang:
                         keranjang[nama_menu]["jumlah"] += jumlah
-                        keranjang[nama_menu]["total_harga"] += harga * jumlah
+                        keranjang[nama_menu]["total_harga"] += int(harga) * jumlah
                     else:
                         keranjang[nama_menu] = {"jumlah": jumlah, "harga_satuan": harga, "total_harga": harga * jumlah}
 
@@ -293,9 +390,9 @@ def buat_pesanan(menu_df):
         print("\n=== Ringkasan Pesanan ===")
         ringkasan = []
         for nama_menu, data in keranjang.items():
-            ringkasan.append([nama_menu, data["jumlah"], data["total_harga"]])
+            ringkasan.append([nama_menu, data["jumlah"], int(data["total_harga"])])
 
-        ringkasan_df = pd.DataFrame(ringkasan, columns=["Nama Menu", "Jumlah", "total_harga"])
+        ringkasan_df = pd.DataFrame(ringkasan, columns=["Nama Menu", "Jumlah", "Total Harga"])
         print(ringkasan_df.to_string(index=False))
 
         kecamatan, ongkir = pilih_kecamatan()
@@ -313,11 +410,12 @@ def buat_pesanan(menu_df):
 
         simpan = input("\nKonfirmasi pesanan? (y/n): ").lower()
         if simpan == "y":
+
             # Simpan orderan dengan menambahkan Nama Stand
             for nama_menu, data in keranjang.items():
                 # Cari stand yang sesuai dengan nama_menu
                 stand_order = menu_df[menu_df["Nama Menu"].str.lower() == nama_menu.lower()]["Stand"].iloc[0]
-                simpan_orderan_ke_csv([stand_order, nama_menu, data["jumlah"], data["total_harga"]])
+                simpan_orderan_ke_csv([stand_order, nama_menu, data["jumlah"], data["total_harga"], "Belum"])
             bayar = input('Silahkan pilih metode pembayaran (QRIS/cash): ').lower()
             if bayar == 'cash':
                 print(f'Silahkan siapkan uang tunai sebesar {total} ya! ^^')
@@ -339,27 +437,26 @@ def buat_pesanan(menu_df):
                     else:
                         print("Input tidak valid. Harap tekan 'enter' setelah selesai melakukan pembayaran.")
             animasi_proses()
+            cetak_struk(keranjang, kecamatan, ongkir, kode_voucher, subtotal, diskon, total)
             print("\nPesanan berhasil disimpan. Terima kasih!")
         else:
             print("Pesanan dibatalkan.")
     else:
         print("Tidak ada item yang dipesan.")
-
+        
 def pembeli():
     menu_df = baca_menu_dari_csv_pembeli()
     if menu_df.empty:
         return
     buat_pesanan(menu_df)
 
-
-#=========================================================================
-
-#=========================================================================
+#================================================================================
 #ADMIN
+#================================================================================
 
 def ringkasan_penjualan(df):
     laporan = df.groupby("Stand").agg(
-        Total_Penjualan=("Total Harga", "sum"),
+        Total_Penjualan=("Harga", "sum"),
         Jumlah_Transaksi=("Jumlah", "sum")
     ).reset_index()
 
@@ -383,7 +480,7 @@ def detail_penjualan_per_stand(df):
         stand_data = df[df["Stand"] == stand]
         laporan_menu = stand_data.groupby("Nama Menu").agg(
             Jumlah_Terjual=("Jumlah", "sum"),
-            Total_Pendapatan=("Total Harga", "sum")
+            Total_Pendapatan=("Harga", "sum")
         ).reset_index()
 
         print(f"{'Menu':<30} {'Jumlah Terjual':<15} {'Total Pendapatan':<15}")
@@ -393,11 +490,11 @@ def detail_penjualan_per_stand(df):
     input("\n(Enter untuk Kembali.)")
 
 def statistik(df):
-    total_penjualan = df["Total Harga"].sum()
-    rata_rata_penjualan = df.groupby("Stand")["Total Harga"].sum().mean()
+    total_penjualan = df["Harga"].sum()
+    rata_rata_penjualan = df.groupby("Stand")["Harga"].sum().mean()
 
-    kontribusi = df.groupby("Stand")["Total Harga"].sum().reset_index()
-    kontribusi["Kontribusi (%)"] = (kontribusi["Total Harga"] / total_penjualan) * 100
+    kontribusi = df.groupby("Stand")["Harga"].sum().reset_index()
+    kontribusi["Kontribusi (%)"] = (kontribusi["Harga"] / total_penjualan) * 100
     
     print("\n===STATISTIK===")
     print(f"Total Penjualan: Rp {total_penjualan:,}")
@@ -487,10 +584,9 @@ def voucher():
                 else:
                     print("Pilihan tidak valid.")
             else:
-                print(f"\n{nama_voucher} tidak ditemukan di menu.")
+                print(f"\nVoucher '{nama_voucher}' tidak ditemukan di menu.")
             input("\n(Enter untuk kembali.)")
-                
-                        
+                 
         elif pilihan == "4":
             header("Admin > Kelola Voucher > Hapus Voucher")
             voucher = pd.read_csv("voucher.csv")
@@ -696,7 +792,7 @@ def registrasi():
             if role == 'Penjual' :
                 penjual(username2)
             elif role == 'Pembeli':
-                # pembeli() ===========================================
+                pembeli()
                 print()
             break
 
