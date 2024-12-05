@@ -239,11 +239,11 @@ def baca_menu_dari_csv_pembeli():
 
 def baca_voucher_dari_csv():
     try:
-        voucher_df = pd.read_csv("voucher.csv", header=None, names=["Kode Voucher", "Diskon"])
+        voucher_df = pd.read_csv("voucher.csv", header=None, names=["Kode Voucher", "Diskon (%)"])
         return voucher_df
     except FileNotFoundError:
         print("Voucher tidak ditemukan. Pastikan file 'voucher.csv' tersedia.")
-        return pd.DataFrame(columns=["Kode Voucher", "Diskon"])
+        return pd.DataFrame(columns=["Kode Voucher", "Diskon (%)"])
 
 def simpan_orderan_ke_csv(orderan):
     with open("orderan.csv", "a", newline="") as file:
@@ -312,8 +312,8 @@ def hitung_total(keranjang, ongkir, voucher_df, kode_voucher=None):
     diskon = 0
     if kode_voucher:
         if kode_voucher.upper() in voucher_df["Kode Voucher"].values:
-            diskon_persen = voucher_df.loc[voucher_df["Kode Voucher"] == kode_voucher.upper(), "Diskon"].values[0]
-            diskon = subtotal * (int(diskon_persen) / 100)
+            diskon_persen = voucher_df.loc[voucher_df["Kode Voucher"] == kode_voucher.upper(), "Diskon (%)"] #.values[0]
+            diskon = subtotal * (float(diskon_persen) / 100)
             print(f"Voucher {kode_voucher.upper()} diterapkan! Anda mendapatkan diskon {diskon_persen}%.")
         else:
             print("Voucher tidak valid atau tidak berlaku.")
@@ -570,9 +570,8 @@ def voucher():
                         banyak_diskon = int(input("Masukkan diskon: "))
                         data_baru = {'Kode Voucher' : nama_baru, 'Diskon (%)' : banyak_diskon}
                         hapus_voucher_lama = voucher[voucher['Kode Voucher'] != nama_voucher]
-                        hapus_voucher_lama.to_csv("voucher.csv", index=False)
-                        data_baru = pd.DataFrame([data_baru])  # Ubah data baru menjadi DataFrame
-                        voucher = pd.concat([voucher.reset_index(), data_baru], ignore_index=True)
+                        data_baru = pd.DataFrame([data_baru])
+                        voucher = pd.concat([hapus_voucher_lama, data_baru], ignore_index=True)
                         voucher.to_csv('voucher.csv', index=False)
                         print(f"Voucher {nama_voucher} berhasil diubah menjadi {nama_baru} dengan potongan harga {banyak_diskon}%.")
                     except ValueError:
