@@ -2,6 +2,7 @@ import pandas as pd
 import csv
 import os
 import time
+import qrcode
 
 #================================================================================
 #PENJUAL
@@ -31,35 +32,6 @@ def simpan_menu_ke_csv(menu, harga, username):
 
     print("Menu baru berhasil ditambahkan!")
 
-def baca_orderan_dari_csv():
-    try:
-        with open("orderan.csv", "r") as file:
-            reader = csv.reader(file)
-            return [baris for baris in reader]
-    except FileNotFoundError:
-        return []  # Jika file belum ada, kembalikan list kosong
-
-def simpan_orderan_ke_csv():
-    with open("orderan.csv", "w", newline="") as file:
-        writer = csv.writer(file)
-        for orderan in daftar_orderan:
-            writer.writerow(orderan)
-
-def baca_orderan_selesai_dari_csv():
-    try:
-        with open("orderan_selesai.csv", "r") as file:
-            reader = csv.reader(file)
-            return [baris for baris in reader]
-    except FileNotFoundError:
-        return []  # Jika file belum ada, kembalikan list kosong
-
-def simpan_orderan_selesai_ke_csv():
-    with open("orderan_selesai.csv", "w", newline="") as file:
-        writer = csv.writer(file)
-        for orderan_selesai in daftar_orderan_selesai:
-            writer.writerow(orderan_selesai)
-
-# kelola menu
 def kelola_menu(username_km):
     while True:
         menu = baca_menu_dari_csv(username_km)
@@ -162,76 +134,6 @@ def kelola_menu(username_km):
         else:
             print("Pilihan tidak valid. Coba lagi.")
 
-def kelola_orderan(username_ko):
-    while True:
-        header('Penjual > Kelola Orderan')
-        print("[1] Lihat Orderan Masuk \n[2] Lihat Orderan yang Sedang Diproses \n[3] Kembali")
-        pilihan = input("Pilih opsi: ")
-
-        if pilihan == "1":
-            header('Penjual > Kelola Orderan > Lihat Orderan Masuk')
-            print("\nOrderan Masuk:")
-            if daftar_orderan:
-                for indeks, orderan in enumerate(daftar_orderan):
-                    print(f"{indeks + 1}. Pesanan: {orderan[0]}, Status: {orderan[1]}")
-                    keputusan = input("Terima (TE) atau Tolak (TO)? (TE untuk Terima, TO untuk Tolak): ").lower()
-                    if keputusan == 'te':
-                        # Jika diterima, pindahkan ke daftar orderan sedang diproses
-                        orderan[1] = "Diproses"
-                        daftar_orderan_diproses.append(orderan)
-                        daftar_orderan.remove(orderan)
-                        simpan_orderan_ke_csv()
-                        print(f"Orderan {orderan[0]} diterima dan sedang diproses.")
-                    elif keputusan == 'to':
-                        daftar_orderan.remove(orderan)
-                        simpan_orderan_ke_csv()
-                        print(f"Orderan {orderan[0]} ditolak.")
-                    else:
-                        print("Pilihan tidak valid. Kembali ke menu.")
-            else:
-                print("Tidak ada orderan masuk.")
-            input('\n(Enter untuk kembali.)')
-
-        elif pilihan == "2":
-            header('Penjual > Kelola Orderan > Lihat Orderan yang Sedang Diproses')
-            print("\nOrderan yang Sedang Diproses:")
-            if daftar_orderan_diproses:
-                for orderan in daftar_orderan_diproses:
-                    print(f"Pesanan: {orderan[0]}, Status: {orderan[1]}")
-                    keputusan = input("Selesai diproses (S) atau belum (B)? (S untuk Selesai, B untuk Belum): ").lower()
-                    if keputusan == 's':
-                        orderan[1] = "Selesai"
-                        daftar_orderan_selesai.append(orderan)
-                        daftar_orderan_diproses.remove(orderan)
-                        simpan_orderan_selesai_ke_csv()
-                        simpan_orderan_ke_csv()
-                        print(f"Orderan {orderan[0]} selesai dan dipindahkan ke laporan penjualan.")
-                    elif keputusan == 'b':
-                        print(f"Orderan {orderan[0]} belum selesai diproses.")
-                    else:
-                        print("Pilihan tidak valid. Kembali ke menu.")
-            else:
-                print("Tidak ada orderan yang sedang diproses.")
-            input('\n(Enter untuk kembali.)')
-        elif pilihan == "3":
-            break
-        else:
-            print("Pilihan tidak valid. Coba lagi.")
-
-def lihat_laporan_penjualan():
-    print("\n=== Laporan Penjualan ===")
-    if daftar_orderan_selesai:
-        for orderan_selesai in daftar_orderan_selesai:
-            print(f"Pesanan: {orderan_selesai[0]}, Status: {orderan_selesai[1]}")
-    else:
-        print("T\nidak ada penjualan yang tercatat.")
-    input('(\nEnter untuk kembali.)')
-
-
-daftar_orderan = baca_orderan_dari_csv()
-daftar_orderan_diproses = []
-daftar_orderan_selesai = baca_orderan_selesai_dari_csv()
-
 def penjual(username):
     while True:
         header("Penjual")
@@ -240,9 +142,11 @@ def penjual(username):
         if pilihan == "1":
             kelola_menu(username)
         elif pilihan == "2":
-            kelola_orderan(username)
+            # kelola_orderan(username)
+            print()
         elif pilihan == "3":
-            lihat_laporan_penjualan(username)
+            # lihat_laporan_penjualan(username)
+            print()
         elif pilihan == "4":
             logout()
             break
@@ -250,11 +154,6 @@ def penjual(username):
             print("Pilihan tidak valid. Coba lagi.")
 #=========================================================================
 #PEMBELI
-
-import pandas as pd
-import csv
-import time
-import qrcode
 
 def baca_menu_dari_csv_pembeli():
     try:
@@ -335,7 +234,7 @@ def pilih_kecamatan():
             print("Kecamatan tidak tersedia. Silakan pilih antara Kaliwates, Sumbersari, atau Patrang.")
 
 def hitung_total(keranjang, ongkir, voucher_df, kode_voucher=None):
-    subtotal = sum(data["total_harga"] for data in keranjang.values()) 
+    subtotal = sum(data["Total Harga"] for data in keranjang.values()) 
     diskon = 0
     if kode_voucher:
         if kode_voucher.upper() in voucher_df["Kode Voucher"].values:
@@ -396,7 +295,7 @@ def buat_pesanan(menu_df):
         for nama_menu, data in keranjang.items():
             ringkasan.append([nama_menu, data["jumlah"], data["total_harga"]])
 
-        ringkasan_df = pd.DataFrame(ringkasan, columns=["Nama Menu", "Jumlah", "Total Harga"])
+        ringkasan_df = pd.DataFrame(ringkasan, columns=["Nama Menu", "Jumlah", "total_harga"])
         print(ringkasan_df.to_string(index=False))
 
         kecamatan, ongkir = pilih_kecamatan()
@@ -457,6 +356,80 @@ def pembeli():
 
 #=========================================================================
 #ADMIN
+
+def ringkasan_penjualan(df):
+    laporan = df.groupby("Stand").agg(
+        Total_Penjualan=("Total Harga", "sum"),
+        Jumlah_Transaksi=("Jumlah", "sum")
+    ).reset_index()
+
+    stand_terlaris = laporan.sort_values(by="Total_Penjualan", ascending=False).iloc[0]
+
+    print("\n===RINGKASAN PENJUALAN===")
+    print(f"{'Stand':<20} {'Total Penjualan':<20} {'Jumlah Transaksi':<20}")
+    print("-" * 60)
+    for index, row in laporan.iterrows():
+        print(f"{row['Stand']:<20} Rp {row['Total_Penjualan']:<20} {row['Jumlah_Transaksi']:<20}")
+    
+    print(f"\nStand Terlaris: {stand_terlaris['Stand']} dengan penjualan Rp {stand_terlaris['Total_Penjualan']:,}")
+    input("\n(Enter untuk Kembali.)")
+
+def detail_penjualan_per_stand(df):
+    print("\n===DETAIL PENJUALAN PER STAND===")
+    stands = df["Stand"].unique()
+
+    for stand in stands:
+        print(f"\n{stand}:")
+        stand_data = df[df["Stand"] == stand]
+        laporan_menu = stand_data.groupby("Nama Menu").agg(
+            Jumlah_Terjual=("Jumlah", "sum"),
+            Total_Pendapatan=("Total Harga", "sum")
+        ).reset_index()
+
+        print(f"{'Menu':<30} {'Jumlah Terjual':<15} {'Total Pendapatan':<15}")
+        print("-" * 60)
+        for index, row in laporan_menu.iterrows():
+            print(f"{row['Nama Menu']:<30} {row['Jumlah_Terjual']:<15} Rp {row['Total_Pendapatan']:<15}")
+    input("\n(Enter untuk Kembali.)")
+
+def statistik(df):
+    total_penjualan = df["Total Harga"].sum()
+    rata_rata_penjualan = df.groupby("Stand")["Total Harga"].sum().mean()
+
+    kontribusi = df.groupby("Stand")["Total Harga"].sum().reset_index()
+    kontribusi["Kontribusi (%)"] = (kontribusi["Total Harga"] / total_penjualan) * 100
+    
+    print("\n===STATISTIK===")
+    print(f"Total Penjualan: Rp {total_penjualan:,}")
+    print(f"Rata-rata Penjualan per Stand: Rp {rata_rata_penjualan:,.2f}")
+    
+    print(f"\n\nKontribusi Penjualan per Stand:\n")
+    print(f"{'Stand':<20} {'Kontribusi (%)':<20}")
+    print("-" * 40)
+    for index, row in kontribusi.iterrows():
+        print(f"{row['Stand']:<20} {row['Kontribusi (%)']:<20.2f}")
+
+    input("\n(Enter untuk Kembali.)")
+
+def catatan_penjualan():  
+    while True : 
+        header("Admin > Catatan Penjualan")
+        print("[1] Ringkasan Penjualan\n[2] Detail Penjualan per Stand\n[3] Statistik\n[4] Keluar")
+        df = pd.read_csv("orderan.csv")
+        pilihan = input("Masukkan opsi: ")
+        if pilihan == '1':
+            header("Admin > Catatan Penjualan > Ringkasan Penjualan")
+            ringkasan_penjualan(df)
+        elif pilihan == "2":
+            header("Admin > Catatan Penjualan > Detail Penjualan per Stand")
+            detail_penjualan_per_stand(df)
+        elif pilihan == "3" :
+            header("Admin > Catatan Penjualan > Statistik")
+            statistik(df)
+        elif pilihan == "4" :
+            break
+        else :
+            print("Pilihan tidak valid.")
 
 def voucher():
     while True :
@@ -537,32 +510,43 @@ def voucher():
 
 def kelola_user_penjual():
     while True :
-        header('Admin > Kelola User Penjual')
-        print("[1] Lihat Daftar Penjual \n[2] Ubah Penjual \n[3] Hapus Penjual \n[4] Kembali")
+        daftar_pengguna = pd.read_csv('DaftarPengguna.csv')
+        header('Admin > Kelola User')
+        print("[1] Lihat Daftar Pengguna \n[2] Ubah Penjual \n[3] Hapus Penjual \n[4] Kembali")
         pilihan = input("Masukkan opsi: ")
 
         if pilihan == "1":
-            header("Admin > Kelola User Penjual > Lihat Daftar Penjual")
-            daftar_penjual = pd.read_csv('DaftarPengguna.csv')
-            print(daftar_penjual)
-            input("\n(Enter untuk kembali.)")
+            header("Admin > Kelola User Penjual > Lihat Daftar Pengguna")
+            print("[1] Lihat Daftar Penjual \n[2] Lihat Daftar Pembeli \n[3] Kembali")
+            masukkan = input("Masukkan opsi: ")
+            if masukkan == "1":
+                header("Admin > Kelola User Penjual > Lihat Daftar Pengguna > Lihat Daftar Penjual")
+                daftar_penjual = daftar_pengguna[daftar_pengguna['role'] == 'Penjual']
+                print(daftar_penjual)
+            elif masukkan == "2":
+                header("Admin > Kelola User Penjual > Lihat Daftar Pengguna > Lihat Daftar Pembeli")
+                daftar_pembeli = daftar_pengguna[daftar_pengguna['role'] == 'Pembeli']
+                print(daftar_pembeli)
+            else :
+                print("Pilihan tidak valid.")
+            input("(Enter untuk kembali.)")
 
         elif pilihan == "2":
             header("Admin > Kelola User Penjual > Ubah Penjual")
-            daftar_penjual = pd.read_csv("DaftarPengguna.csv")
+            daftar_penjual = daftar_pengguna[daftar_pengguna['role'] == 'Penjual']
             daftar_stand = pd.read_csv("stand.csv")
             print(daftar_penjual)
             nama_penjual = input("\nMasukkan nama user yang ingin diubah: ")
-            if nama_penjual in daftar_penjual["Stand"].values:
+            if nama_penjual in daftar_penjual["username"].values:
                 print(f"{nama_penjual} sudah ada di daftar.")
                 ubah = input("Apakah Anda ingin mengubah nama user? (y untuk ya, b untuk batal): ").lower()
                 if ubah == 'y':
-                    nama_baru = input("Masukkan nama baru untuk user: ")
-                    daftar_penjual.loc[daftar_penjual["Stand"] == nama_penjual, "Stand"] = nama_baru
-                    daftar_penjual.to_csv("DaftarPengguna.csv", index=False)
+                    nama_baru = input("Masukkan nama yang baru untuk user : ")
+                    daftar_pengguna.loc[daftar_pengguna["username"] == nama_penjual, "username"] = nama_baru
+                    daftar_pengguna.to_csv("DaftarPengguna.csv", index=False)
                     daftar_stand.loc[daftar_stand["Stand"] == nama_penjual, "Stand"] = nama_baru
                     daftar_stand.to_csv("stand.csv", index=False)
-                    print(f"Nama user telah berhasil diubah dari {nama_penjual} menjadi {nama_baru}.")     
+                    print(f"User Penjual {nama_penjual} berhasil diubah menjadi {nama_baru}.")
                 elif ubah == 'b':
                     print("Perubahan dibatalkan.")
                     break
@@ -574,17 +558,17 @@ def kelola_user_penjual():
                              
         elif pilihan == "3":
             header("Admin > Kelola Penjual > Hapus Penjual")
-            daftar_penjual = pd.read_csv("DaftarPengguna.csv")
+            daftar_penjual = daftar_pengguna[daftar_pengguna['role'] == 'Penjual']
             daftar_stand = pd.read_csv("stand.csv")
             print(daftar_penjual)
             nama_penjual = input("\nMasukkan nama user yang ingin dihapus: ")
     
-            if nama_penjual in daftar_penjual["Stand"].values:
+            if nama_penjual in daftar_penjual["username"].values:
                 print(f"{nama_penjual} ditemukan dalam daftar.")
                 hapus = input("Apakah Anda yakin ingin menghapus penjual ini? (y untuk ya, b untuk batal): ").lower()
                 if hapus == 'y':
-                    daftar_penjual = daftar_penjual[daftar_penjual["Stand"] != nama_penjual]
-                    daftar_penjual.to_csv("DaftarPengguna.csv", index=False)
+                    daftar_pengguna = daftar_pengguna[daftar_pengguna["username"] != nama_penjual]
+                    daftar_pengguna.to_csv("DaftarPengguna.csv", index=False)
                     daftar_stand = daftar_stand[daftar_stand["Stand"] != nama_penjual]
                     daftar_stand.to_csv("stand.csv", index=False)
                     print(f"Penjual {nama_penjual} berhasil dihapus dari semua file terkait.")
@@ -605,14 +589,12 @@ def kelola_user_penjual():
 def admin():
     while True:
         header("Admin")
-        print("[1] Kelola User Penjual\n[2] Lihat Orderan Masuk\n[3] Kelola Voucher\n[4] Keluar")   
+        print("[1] Kelola User\n[2] Catatan Penjualan\n[3] Kelola Voucher\n[4] Keluar")   
         pilihan = input("Masukkan opsi: ")
         if pilihan == "1":
             kelola_user_penjual()
         elif pilihan == "2":
-            header("Admin > Lihat Orderan Masuk")
-            lihat_orderan_masuk = pd.read_csv("orderan_selesai.csv")
-            print(lihat_orderan_masuk)
+            catatan_penjualan()
         elif pilihan == "3":
             voucher()
         elif pilihan == "4":
@@ -674,7 +656,7 @@ def login():
                     elif daftar_pengguna.loc[username1, 'role'] == "Pembeli":
                         pembeli()
                     elif daftar_pengguna.loc[username1, 'role'] == "Admin":
-                        admin(username1)
+                        admin()
                     masukkan_password = False
                 else :
                     print('\n|  Password yang anda masukkan salah!\n| Silahkan coba kembali...')
