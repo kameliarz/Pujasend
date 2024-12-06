@@ -239,11 +239,11 @@ def baca_menu_dari_csv_pembeli():
 
 def baca_voucher_dari_csv():
     try:
-        voucher_df = pd.read_csv("voucher.csv", header=None, names=["Kode Voucher", "Diskon (%)"])
+        voucher_df = pd.read_csv("voucher.csv", header=None, names=["Kode Voucher", "Diskon"])
         return voucher_df
     except FileNotFoundError:
         print("Voucher tidak ditemukan. Pastikan file 'voucher.csv' tersedia.")
-        return pd.DataFrame(columns=["Kode Voucher", "Diskon (%)"])
+        return pd.DataFrame(columns=["Kode Voucher", "Diskon"])
 
 def simpan_orderan_ke_csv(orderan):
     with open("orderan.csv", "a", newline="") as file:
@@ -312,7 +312,7 @@ def hitung_total(keranjang, ongkir, voucher_df, kode_voucher=None):
     diskon = 0
     if kode_voucher:
         if kode_voucher.upper() in voucher_df["Kode Voucher"].values:
-            diskon_persen = voucher_df.loc[voucher_df["Kode Voucher"] == kode_voucher.upper(), "Diskon (%)"] #.values[0]
+            diskon_persen = voucher_df.loc[voucher_df["Kode Voucher"] == kode_voucher.upper(), "Diskon"].values[0]
             diskon = subtotal * (float(diskon_persen) / 100)
             print(f"Voucher {kode_voucher.upper()} diterapkan! Anda mendapatkan diskon {diskon_persen}%.")
         else:
@@ -321,6 +321,7 @@ def hitung_total(keranjang, ongkir, voucher_df, kode_voucher=None):
     return subtotal, diskon, total
         
 def tampilkan_menu(menu_df, stand):
+    header("Daftar Stand > Lihat Menu dan Buat Pesanan")
     print(f"\n=== Menu di Stand {stand.capitalize()} ===")
     stand_menu = menu_df[menu_df["Stand"].str.lower() == stand.lower()]
     if not stand_menu.empty:
@@ -330,6 +331,7 @@ def tampilkan_menu(menu_df, stand):
         print("Menu kosong. Tidak ada data untuk ditampilkan.")
         
 def cetak_struk(keranjang, kecamatan, ongkir, kode_voucher, subtotal, diskon, total):
+    header('Struk Belanja')
     waktu = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     print("\n" + "=" * 55)
     print(f"{'Struk Pembelian':^55}")
@@ -355,9 +357,9 @@ def cetak_struk(keranjang, kecamatan, ongkir, kode_voucher, subtotal, diskon, to
 def buat_pesanan(menu_df):
     keranjang = {}
     voucher_df = baca_voucher_dari_csv()
-
     while True:
         stand = pilih_stand(menu_df)
+        header("Daftar Stand > Lihat Menu dan Buat Pesanan")
         tampilkan_menu(menu_df, stand)
         while True:
             try:
@@ -410,10 +412,7 @@ def buat_pesanan(menu_df):
 
         simpan = input("\nKonfirmasi pesanan? (y/n): ").lower()
         if simpan == "y":
-
-            # Simpan orderan dengan menambahkan Nama Stand
             for nama_menu, data in keranjang.items():
-                # Cari stand yang sesuai dengan nama_menu
                 stand_order = menu_df[menu_df["Nama Menu"].str.lower() == nama_menu.lower()]["Stand"].iloc[0]
                 simpan_orderan_ke_csv([stand_order, nama_menu, data["jumlah"], data["total_harga"], "Belum"])
             bayar = input('Silahkan pilih metode pembayaran (QRIS/cash): ').lower()
@@ -445,6 +444,7 @@ def buat_pesanan(menu_df):
         print("Tidak ada item yang dipesan.")
         
 def pembeli():
+    header("PEMBELI")
     menu_df = baca_menu_dari_csv_pembeli()
     if menu_df.empty:
         return
@@ -570,7 +570,8 @@ def voucher():
                         banyak_diskon = int(input("Masukkan diskon: "))
                         data_baru = {'Kode Voucher' : nama_baru, 'Diskon (%)' : banyak_diskon}
                         hapus_voucher_lama = voucher[voucher['Kode Voucher'] != nama_voucher]
-                        data_baru = pd.DataFrame([data_baru])
+                        hapus_voucher_lama.to_csv("voucher.csv", index=False)
+                        data_baru = pd.DataFrame([data_baru])  # Ubah data baru menjadi DataFrame
                         voucher = pd.concat([hapus_voucher_lama, data_baru], ignore_index=True)
                         voucher.to_csv('voucher.csv', index=False)
                         print(f"Voucher {nama_voucher} berhasil diubah menjadi {nama_baru} dengan potongan harga {banyak_diskon}%.")
