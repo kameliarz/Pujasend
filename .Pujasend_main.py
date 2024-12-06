@@ -511,7 +511,7 @@ def statistik(df):
 def catatan_penjualan():  
     while True : 
         header("Admin > Catatan Penjualan")
-        print("[1] Ringkasan Penjualan\n[2] Detail Penjualan per Stand\n[3] Statistik\n[4] Keluar")
+        print("[1] Ringkasan Penjualan\n[2] Detail Penjualan per Stand\n[3] Statistik\n[4] Kembali")
         df = pd.read_csv("orderan.csv")
         pilihan = input("Masukkan opsi: ")
         if pilihan == '1':
