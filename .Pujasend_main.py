@@ -783,14 +783,14 @@ def login():
                         j = 3
                 else :
                     j +=1
-                    if j < 2:
+                    if j < 3:
                         print('\n|  Password yang anda masukkan salah!\n| Silahkan coba kembali...')
                     else :
                         print('\n| Anda salah memasukkan password sebanyak tiga kali.\n| Anda akan diarahkan ke menu utama.')
                         input('\n\n(Enter untuk melanjutkan.)')
         else :
             i += 1
-            if i < 2:
+            if i < 3:
                 print('\n|  Maaf, username tidak dikenali\n|    Silahkan coba kembali...')
             else :
                 print("\n| Maaf, kami tidak mengenali anda.\n| Silahkan daftarkan akun anda untuk masuk.")
