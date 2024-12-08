@@ -389,25 +389,25 @@ def buat_pesanan(menu_df):
             break
 
     if keranjang:
-        print("\n=== Ringkasan Pesanan ===")
+        header("Daftar Stand > Lihat Menu dan Buat Pesanan > Ringkasan Pesanan")
         ringkasan = []
         for nama_menu, data in keranjang.items():
             ringkasan.append([nama_menu, data["jumlah"], int(data["total_harga"])])
 
         ringkasan_df = pd.DataFrame(ringkasan, columns=["Nama Menu", "Jumlah", "Total Harga"])
         print(ringkasan_df.to_string(index=False))
-
+        print('\n')
         kecamatan, ongkir = pilih_kecamatan()
-        print(f"Ongkir ke kecamatan {kecamatan.capitalize()}: Rp{ongkir}")
+        print(f"Ongkir ke kecamatan {kecamatan.capitalize()}: Rp{ongkir}\n")
 
         kode_voucher = input("Masukkan kode voucher (jika ada) atau tekan Enter: ").upper()
 
         subtotal, diskon, total = hitung_total(keranjang, ongkir, voucher_df, kode_voucher)
 
-        print(f"\nSubtotal: Rp{subtotal}")
+        print(f"\nSubtotal                : Rp{subtotal}")
         if diskon > 0:
-            print(f"Diskon: Rp{int(diskon)}")
-        print(f"Ongkir: Rp{ongkir}")
+            print(f"Diskon                  : Rp{int(diskon)}")
+        print(f"Ongkir                  : Rp{ongkir}")
         print(f"Total yang harus dibayar: Rp{total}")
 
         simpan = input("\nKonfirmasi pesanan? (y/n): ").lower()
@@ -415,6 +415,7 @@ def buat_pesanan(menu_df):
             for nama_menu, data in keranjang.items():
                 stand_order = menu_df[menu_df["Nama Menu"].str.lower() == nama_menu.lower()]["Stand"].iloc[0]
                 simpan_orderan_ke_csv([stand_order, nama_menu, data["jumlah"], data["total_harga"], "Belum"])
+            header("Pembayaran")
             bayar = input('Silahkan pilih metode pembayaran (QRIS/cash): ').lower()
             if bayar == 'cash':
                 print(f'Silahkan siapkan uang tunai sebesar {total} ya! ^^')
@@ -438,17 +439,37 @@ def buat_pesanan(menu_df):
             animasi_proses()
             cetak_struk(keranjang, kecamatan, ongkir, kode_voucher, subtotal, diskon, total)
             print("\nPesanan berhasil disimpan. Terima kasih!")
+            input("\nTekan 'Enter' untuk kembali ke menu utama...")
         else:
             print("Pesanan dibatalkan.")
     else:
         print("Tidak ada item yang dipesan.")
         
 def pembeli():
-    header("PEMBELI")
+    header("Daftar Stand")
     menu_df = baca_menu_dari_csv_pembeli()
     if menu_df.empty:
         return
     buat_pesanan(menu_df)
+    
+def main_pembeli():
+    while True:
+        header("PEMBELI")
+        print("\n=== Selamat Datang di Pujasend ===")
+        print("1. Lihat menu dan pesan")
+        print("2. Keluar")
+        
+        try:
+            pilihan_user = int(input("Pilih menu (1/2): "))
+            if pilihan_user == 1:
+                pembeli()
+            elif pilihan_user == 2:
+                header("", homepage=1)
+                break
+            else:
+                print("Pilihan tidak valid. Silakan coba lagi.")
+        except ValueError:
+            print("Input harus berupa angka. Silakan coba lagi.")
 
 #================================================================================
 #ADMIN
@@ -750,7 +771,7 @@ def login():
                     if daftar_pengguna.loc[username1, 'role'] == "Penjual":
                         penjual(username1)
                     elif daftar_pengguna.loc[username1, 'role'] == "Pembeli":
-                        pembeli()
+                        main_pembeli()
                     elif daftar_pengguna.loc[username1, 'role'] == "Admin":
                         admin()
                     masukkan_password = False
