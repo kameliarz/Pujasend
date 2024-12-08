@@ -406,7 +406,7 @@ def buat_pesanan(menu_df):
             header("Pembayaran")
             bayar = input('Silahkan pilih metode pembayaran (QRIS/cash): ').lower()
             if bayar == 'cash':
-                print(f'Silahkan siapkan uang tunai sebesar {total} ya! ^^')
+                print(f'Silahkan siapkan uang tunai sebesar Rp {total} ya! ^^')
             elif bayar == 'qris':
                 data = "bayar woi"
                 qr = qrcode.QRCode(version=1, box_size=1, border=1)  
@@ -416,7 +416,7 @@ def buat_pesanan(menu_df):
                 ascii_qr = "\n".join(
                    "".join("██" if cell else "  " for cell in row) for row in qr_matrix
                 )
-                print(f'Silahkan scan qrcode berikut dengan total {total}')
+                print(f'Silahkan scan qrcode berikut dengan total Rp {total}')
                 print(ascii_qr)
                 while True:
                     validasi_bayar = input("Tekan 'enter' jika telah selesai melakukan pembayaran: ")
