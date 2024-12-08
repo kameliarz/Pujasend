@@ -22,6 +22,7 @@ def baca_menu_dari_csv(username):
 def simpan_menu_ke_csv(menu, harga, username):
     nama_stand = username
     menu_baru = {'Stand': nama_stand, 'Nama Menu': menu, 'Harga': harga}
+
     try:
         df = pd.read_csv('stand.csv', encoding='utf-8-sig')
     except FileNotFoundError:
@@ -44,11 +45,9 @@ def kelola_menu(username_km):
         if pilihan == "1":
             header('Penjual > Kelola Menu > Lihat Menu')
             print("\nDaftar Menu:")
-            angka = 1
             if menu:
-                for nama_menu,harga_menu in menu.items():
-                    print(f"{angka}. {nama_menu} - Rp{harga_menu}")
-                    angka +=1
+                menu_data = [[nama_menu, f"Rp{harga_menu}"] for nama_menu, harga_menu in menu.items()]
+                print(tabulate(menu_data, headers=["Nama Menu", "Harga"], tablefmt="fancy_grid"))
             else:
                 print("\nMenu masih kosong.")
             input("\n(Enter untuk kembali)")
@@ -59,7 +58,7 @@ def kelola_menu(username_km):
             if nama_menu in menu:
                 print(f"{nama_menu} sudah ada di menu.")
             else:
-                while True :
+                while True:
                     try:
                         harga_menu = int(input("Masukkan harga menu: "))
                         simpan_menu_ke_csv(nama_menu, harga_menu, username_km)
@@ -71,12 +70,9 @@ def kelola_menu(username_km):
 
         elif pilihan == "3":
             header('Penjual > Kelola Menu > Ubah Menu')
-            angka = 1
             if menu:
-                for nama_menu,harga_menu in menu.items():
-                    print(f"{angka}. {nama_menu} - Rp{harga_menu}")
-                    angka +=1
-                
+                menu_data = [[nama_menu, f"Rp{harga_menu}"] for nama_menu, harga_menu in menu.items()]
+                print(tabulate(menu_data, headers=["No.", "Nama Menu", "Harga"], tablefmt="fancy_grid"))
                 nama_menu = input("\nMasukkan nama menu yang ingin diubah: ")
                 if nama_menu in menu:
                     print(f"\n| {nama_menu} ditemukan di daftar menu.\n")
@@ -84,10 +80,10 @@ def kelola_menu(username_km):
                     hapus_menu_lama = df[df['Nama Menu'] != nama_menu]
                     hapus_menu_lama.to_csv("stand.csv", index=False)
                     ubah = input("Apakah Anda ingin mengubah nama atau harga menu? (y untuk ya, b untuk batal): ").lower()
-                
+
                     if ubah == 'y':
                         nama_baru = input("\nMasukkan nama baru untuk menu: ")
-                        while True :
+                        while True:
                             try:
                                 harga_baru = int(input("Masukkan harga baru untuk menu: "))
                                 simpan_menu_ke_csv(nama_baru, harga_baru, username_km)  
@@ -99,7 +95,6 @@ def kelola_menu(username_km):
                         
                     elif ubah == 'b':
                         print("Perubahan dibatalkan.")
-                        break
                     else:
                         print("Pilihan tidak valid.")
                 else:
@@ -111,11 +106,9 @@ def kelola_menu(username_km):
 
         elif pilihan == "4":
             header('Penjual > Kelola Menu > Hapus Menu')
-            angka = 1
             if menu:
-                for nama_menu,harga_menu in menu.items():
-                    print(f"{angka}. {nama_menu} - Rp{harga_menu}")
-                    angka +=1
+                menu_data = [[nama_menu, f"Rp{harga_menu}"] for nama_menu, harga_menu in menu.items()]
+                print(tabulate(menu_data, headers=["No.", "Nama Menu", "Harga"], tablefmt="fancy_grid"))
             else:
                 print("Menu masih kosong.")
             nama_menu = input("\nMasukkan nama menu yang ingin dihapus: ")
@@ -126,7 +119,6 @@ def kelola_menu(username_km):
                 hapus_menu_lama.to_csv("stand.csv", index=False)
                 print(f"{nama_menu} berhasil dihapus!")
             else:
-                
                 print("\nMenu tidak ditemukan.")
             input('\n(Enter untuk kembali.)')
 
@@ -151,8 +143,7 @@ def tampilkan_pesanan_belum_diproses(stand):
         print(f"\nTidak ada pesanan yang belum diproses.")
     else:
         print(f"\nPesanan belum diproses :")
-        for i, row in df_stand.iterrows():
-            print(f"{row['Nama Menu']} - {row['Jumlah']} pcs - Rp{row['Harga']}")
+    print(tabulate(df_stand, headers=["Nama stand", "Pesanan", "Jumlah", "Harga total", "Status"], tablefmt="fancy_grid"))
     input("\n(Enter untuk kembali.)")
 
 def ubah_status_pesanan(stand):
@@ -164,8 +155,7 @@ def ubah_status_pesanan(stand):
         return
 
     print(f"\nPesanan belum diproses :")
-    for i, row in df_stand.iterrows():
-        print(f"{i}. {row['Nama Menu']} - {row['Jumlah']} pcs - Rp{row['Harga']}")
+    print(tabulate(df_stand, headers=["No", "Nama stand", "Pesanan", "Jumlah", "Status"], tablefmt="fancy_grid"))
 
     try:
         index = int(input("\nMasukkan nomor pesanan yang ingin diubah statusnya: "))
@@ -188,8 +178,7 @@ def tampilkan_arsip_pesanan(stand):
         print(f"\nTidak ada arsip pesanan.")
     else:
         print(f"\nArsip pesanan :")
-        for i, row in df_stand.iterrows():
-            print(f"{i}. {row['Nama Menu']} - {row['Jumlah']} pcs - Rp{row['Harga']}")
+    print(tabulate(df_stand, headers=["Nama Stand","Pesanan","Jumlah", "Harga total", "status"], tablefmt="fancy_grid", showindex=False))
     input("\n(Enter untuk kembali.)")
 
 def kelola_orderan(username_ko):
