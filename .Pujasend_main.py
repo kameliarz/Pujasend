@@ -311,14 +311,12 @@ def hitung_total(keranjang, ongkir, voucher_df, kode_voucher=None):
     return subtotal, diskon, total
         
 def tampilkan_menu(menu_df, stand):
-    header("Daftar Stand > Lihat Menu dan Buat Pesanan")
     print(f"\n=== Menu di Stand {stand.capitalize()} ===")
     stand_menu = menu_df[menu_df["Stand"].str.lower() == stand.lower()]
-
     if not stand_menu.empty:
         menu_list = [
-            [idx + 1, row["Nama Menu"], f"Rp{row['Harga']}"]
-            for idx, row in stand_menu.iterrows()
+            [idx, row['Nama Menu'], f"Rp{row['Harga']}"]
+            for idx, (_, row) in enumerate(stand_menu.iterrows(), start=1)
         ]
         print(tabulate(menu_list, headers=["No", "Nama Menu", "Harga"], tablefmt="fancy_grid"))
     else:
