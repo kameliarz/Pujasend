@@ -4,6 +4,7 @@ import os
 import time
 import qrcode
 from datetime import datetime
+from tabulate import tabulate
 
 #================================================================================
 #PENJUAL
@@ -252,9 +253,9 @@ def simpan_orderan_ke_csv(orderan):
 
 def tampilkan_stand(stand_df):
     print("\n=== Daftar Stand ===")
-    stands = stand_df["Stand"].unique()  
-    for i, stand in enumerate(stands, start=1):
-        print(f"{i}. {stand}")
+    stands = stand_df["Stand"].unique()
+    stand_list = [[i + 1, stand] for i, stand in enumerate(stands)]
+    print(tabulate(stand_list, headers=["No", "Stand"], tablefmt="grid"))
     return stands
 
 def pilih_stand(stand_df):
@@ -325,8 +326,8 @@ def tampilkan_menu(menu_df, stand):
     print(f"\n=== Menu di Stand {stand.capitalize()} ===")
     stand_menu = menu_df[menu_df["Stand"].str.lower() == stand.lower()]
     if not stand_menu.empty:
-        for idx, (index, row) in enumerate(stand_menu.iterrows(), start=1):
-            print(f"{idx}. {row['Nama Menu']} - Rp{row['Harga']}")
+        menu_list = [[idx + 1, row["Nama Menu"], f"Rp{row['Harga']}"] for idx, (_, row) in enumerate(stand_menu.iterrows())]
+        print(tabulate(menu_list, headers=["No", "Nama Menu", "Harga"], tablefmt="grid"))
     else:
         print("Menu kosong. Tidak ada data untuk ditampilkan.")
         
@@ -390,12 +391,8 @@ def buat_pesanan(menu_df):
 
     if keranjang:
         header("Daftar Stand > Lihat Menu dan Buat Pesanan > Ringkasan Pesanan")
-        ringkasan = []
-        for nama_menu, data in keranjang.items():
-            ringkasan.append([nama_menu, data["jumlah"], int(data["total_harga"])])
-
-        ringkasan_df = pd.DataFrame(ringkasan, columns=["Nama Menu", "Jumlah", "Total Harga"])
-        print(ringkasan_df.to_string(index=False))
+        ringkasan = [[nama_menu, data["jumlah"], int(data["total_harga"])] for nama_menu, data in keranjang.items()]
+        print(tabulate(ringkasan, headers=["Nama Menu", "Jumlah", "Total Harga"], tablefmt="grid"))
         print('\n')
         kecamatan, ongkir = pilih_kecamatan()
         print(f"Ongkir ke kecamatan {kecamatan.capitalize()}: Rp{ongkir}\n")
