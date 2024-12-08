@@ -457,8 +457,8 @@ def main_pembeli():
     while True:
         header("PEMBELI")
         print("\n=== Selamat Datang di Pujasend ===")
-        print("1. Lihat menu dan pesan")
-        print("2. Keluar")
+        print("[1] Lihat menu dan pesan")
+        print("[2] Keluar")
         
         try:
             pilihan_user = int(input("Pilih menu (1/2): "))
