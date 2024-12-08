@@ -255,7 +255,7 @@ def tampilkan_stand(stand_df):
     print("\n=== Daftar Stand ===")
     stands = stand_df["Stand"].unique()
     stand_list = [[i + 1, stand] for i, stand in enumerate(stands)]
-    print(tabulate(stand_list, headers=["No", "Stand"], tablefmt="grid"))
+    print(tabulate(stand_list, headers=["No", "Stand"], tablefmt="fancy_grid"))
     return stands
 
 def pilih_stand(stand_df):
@@ -325,9 +325,13 @@ def tampilkan_menu(menu_df, stand):
     header("Daftar Stand > Lihat Menu dan Buat Pesanan")
     print(f"\n=== Menu di Stand {stand.capitalize()} ===")
     stand_menu = menu_df[menu_df["Stand"].str.lower() == stand.lower()]
+
     if not stand_menu.empty:
-        menu_list = [[idx + 1, row["Nama Menu"], f"Rp{row['Harga']}"] for idx, (_, row) in enumerate(stand_menu.iterrows())]
-        print(tabulate(menu_list, headers=["No", "Nama Menu", "Harga"], tablefmt="grid"))
+        menu_list = [
+            [idx + 1, row["Nama Menu"], f"Rp{row['Harga']}"]
+            for idx, row in stand_menu.iterrows()
+        ]
+        print(tabulate(menu_list, headers=["No", "Nama Menu", "Harga"], tablefmt="fancy_grid"))
     else:
         print("Menu kosong. Tidak ada data untuk ditampilkan.")
         
@@ -392,7 +396,7 @@ def buat_pesanan(menu_df):
     if keranjang:
         header("Daftar Stand > Lihat Menu dan Buat Pesanan > Ringkasan Pesanan")
         ringkasan = [[nama_menu, data["jumlah"], int(data["total_harga"])] for nama_menu, data in keranjang.items()]
-        print(tabulate(ringkasan, headers=["Nama Menu", "Jumlah", "Total Harga"], tablefmt="grid"))
+        print(tabulate(ringkasan, headers=["Nama Menu", "Jumlah", "Total Harga"], tablefmt="fancy_grid"))
         print('\n')
         kecamatan, ongkir = pilih_kecamatan()
         print(f"Ongkir ke kecamatan {kecamatan.capitalize()}: Rp{ongkir}\n")
