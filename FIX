@@ -72,7 +72,7 @@ def kelola_menu(username_km):
             header('Penjual > Kelola Menu > Ubah Menu')
             if menu: 
                 menu_data = [[nama_menu, f"Rp{harga_menu}"] for nama_menu, harga_menu in menu.items()]
-                print(tabulate(menu_data, headers=["No.", "Nama Menu", "Harga"], tablefmt="fancy_grid"))
+                print(tabulate(menu_data, headers=["Nama Menu", "Harga"], tablefmt="fancy_grid"))
                 nama_menu = input("\nMasukkan nama menu yang ingin diubah: ") 
                 if nama_menu in menu:
                     print(f"\n| {nama_menu} ditemukan di daftar menu.\n") 
@@ -108,7 +108,7 @@ def kelola_menu(username_km):
             header('Penjual > Kelola Menu > Hapus Menu')
             if menu:
                 menu_data = [[nama_menu, f"Rp{harga_menu}"] for nama_menu, harga_menu in menu.items()]
-                print(tabulate(menu_data, headers=["No.", "Nama Menu", "Harga"], tablefmt="fancy_grid"))
+                print(tabulate(menu_data, headers=["Nama Menu", "Harga"], tablefmt="fancy_grid"))
             else:
                 print("Menu masih kosong.")
             nama_menu = input("\nMasukkan nama menu yang ingin dihapus: ")
@@ -157,7 +157,7 @@ def ubah_status_pesanan(stand):
         return 
 
     print(f"\nPesanan belum diproses :")
-    print(tabulate(df_stand, headers=["No", "Nama stand", "Pesanan", "Jumlah", "Status"], tablefmt="fancy_grid"))
+    print(tabulate(df_stand, headers=["Nama stand", "Pesanan", "Jumlah", "Status"], tablefmt="fancy_grid"))
 
     try:
         index = int(input("\nMasukkan nomor pesanan yang ingin diubah statusnya: "))
@@ -403,7 +403,7 @@ def buat_pesanan(menu_df):
         simpan = input("\nKonfirmasi pesanan? (y/n): ").lower()
         if simpan == "y":
             for nama_menu, data in keranjang.items():
-                stand_order = menu_df[menu_df["Nama Menu"].str.lower() == nama_menu.lower()]["Stand"].iloc[0]
+                stand_order = menu_df[menu_df["Nama Menu"].str.lower() == nama_menu.lower()]["Stand"]
                 simpan_orderan_ke_csv([stand_order, nama_menu, data["jumlah"], data["total_harga"], "Belum"])
             header("Pembayaran")
             bayar = input('Silahkan pilih metode pembayaran (QRIS/cash): ').lower()
@@ -643,7 +643,7 @@ def kelola_user_penjual():
             header("Admin > Kelola User Penjual > Ubah Penjual")
             daftar_penjual = daftar_pengguna[daftar_pengguna['role'] == 'Penjual']
             daftar_stand = pd.read_csv("stand.csv")
-            print(daftar_penjual)
+            print(tabulate(daftar_penjual, headers="keys", tablefmt="fancy_grid", showindex=False))
             nama_penjual = input("\nMasukkan nama user yang ingin diubah: ")
             if nama_penjual in daftar_penjual["username"].values:
                 print(f"{nama_penjual} sudah ada di daftar.")
@@ -668,7 +668,7 @@ def kelola_user_penjual():
             header("Admin > Kelola Penjual > Hapus Penjual")
             daftar_penjual = daftar_pengguna[daftar_pengguna['role'] == 'Penjual']
             daftar_stand = pd.read_csv("stand.csv")
-            print(daftar_penjual)
+            print(tabulate(daftar_penjual, headers="keys", tablefmt="fancy_grid", showindex=False))
             nama_penjual = input("\nMasukkan nama user yang ingin dihapus: ")
     
             if nama_penjual in daftar_penjual["username"].values:
