@@ -13,30 +13,30 @@ from tabulate import tabulate
 def baca_menu_dari_csv(username): 
     try:
         df = pd.read_csv("stand.csv")
-        stand = df[df["Stand"] == username] #memfilter menu berdasarkan standnya
-        menu = { row["Nama Menu"]: row["Harga"] for _, row in stand.iterrows()} #mengambil nama meny dan harga di tiap baris
-        return menu # direturn ke program yang memanggil
+        stand = df[df["Stand"] == username] 
+        menu = { row["Nama Menu"]: row["Harga"] for _, row in stand.iterrows()} 
+        return menu 
     except FileNotFoundError:
-        return {} #direturn dict kosong karena file tidak ditemukan
+        return {} 
 
 def simpan_menu_ke_csv(menu, harga, username):
-    nama_stand = username # jika usn Stand rice bowl maka yg muncul standnya rice bowl
-    menu_baru = {'Stand': nama_stand, 'Nama Menu': menu, 'Harga': harga} #ini kalo mau masukin menu baru, dlm bentuk dict
+    nama_stand = username 
+    menu_baru = {'Stand': nama_stand, 'Nama Menu': menu, 'Harga': harga} 
 
     try:
-        df = pd.read_csv('stand.csv', encoding='utf-8-sig') #ini digunakan untuk mencoba untuk membaca file stand.csv
-    except FileNotFoundError: #kalo gak nemu
+        df = pd.read_csv('stand.csv', encoding='utf-8-sig') 
+    except FileNotFoundError: 
         print("File tidak ditemukan. Membuat file baru...")
-        df = pd.DataFrame(columns=['Stand', 'Nama Menu', 'Harga'])#dibuat tabel kosong yg cuma isinya header
+        df = pd.DataFrame(columns=['Stand', 'Nama Menu', 'Harga'])
 
-    menu_baru_df = pd.DataFrame([menu_baru]) #td menu baru masih dlm bentuk dict,disini diubah menjadi bentuk dataframe 
-    df = pd.concat([df, menu_baru_df], ignore_index=True)#fungsinya? agar bisa digabung dengan menu yg lama, sehingga menu baru dapat ditambah
-    df.to_csv('stand.csv', index=False, encoding='utf-8-sig') #untuk menyimpan df hasil gabungan tadi ke stand.csv, index false agar tidak ada index, utf: agar karakter yg bukan Ascii bisa ke detect dan ditranslate ke karakter yg bisa dipahami
+    menu_baru_df = pd.DataFrame([menu_baru]) 
+    df = pd.concat([df, menu_baru_df], ignore_index=True)
+    df.to_csv('stand.csv', index=False, encoding='utf-8-sig') 
 
     print("Menu baru berhasil ditambahkan!")
 
-def kelola_menu(username_km): #kenapa pake usn_km, ini buat mastiin cuma menu milik penjual yg sesuai dgn stand yg dikelola
-    while True: # agar terus loop hingga sikon terpenuhi, dan penjual kembali ke menu utama
+def kelola_menu(username_km):
+    while True: 
         menu = baca_menu_dari_csv(username_km)
         header("Penjual > Kelola Menu")
         print("[1] Lihat Menu\n[2] Tambah Menu\n[3] Ubah Menu\n[4] Hapus Menu\n[5] Kembali ke Menu Utama")
@@ -45,8 +45,8 @@ def kelola_menu(username_km): #kenapa pake usn_km, ini buat mastiin cuma menu mi
         if pilihan == "1":
             header('Penjual > Kelola Menu > Lihat Menu')
             print("\nDaftar Menu:")
-            if menu: # untuk mengecek apakah dict menu memiliki nama menu dan harga atau tidak
-                menu_data = [[nama_menu, f"Rp{harga_menu}"] for nama_menu, harga_menu in menu.items()] # ini menampilan menu yg berasal dr variabel nama menu dan harganya
+            if menu: 
+                menu_data = [[nama_menu, f"Rp{harga_menu}"] for nama_menu, harga_menu in menu.items()]
                 print(tabulate(menu_data, headers=["Nama Menu", "Harga"], tablefmt="fancy_grid"))
             else:
                 print("\nMenu masih kosong.")
@@ -70,15 +70,15 @@ def kelola_menu(username_km): #kenapa pake usn_km, ini buat mastiin cuma menu mi
 
         elif pilihan == "3":
             header('Penjual > Kelola Menu > Ubah Menu')
-            if menu: #mula2 dilakukan pengecekan dulu di menu apakah ada isinya atau gak
-                menu_data = [[nama_menu, f"Rp{harga_menu}"] for nama_menu, harga_menu in menu.items()]#jika ada menu akan ditampilkan dalam bentuk tabel dengan memanggil variabel nama menu dan harga menu di dict menu. dankemudian disimpan di vari menu_data
+            if menu: 
+                menu_data = [[nama_menu, f"Rp{harga_menu}"] for nama_menu, harga_menu in menu.items()]
                 print(tabulate(menu_data, headers=["No.", "Nama Menu", "Harga"], tablefmt="fancy_grid"))
-                nama_menu = input("\nMasukkan nama menu yang ingin diubah: ") #untuk tampilan di terminal akan muncul seperti ini
+                nama_menu = input("\nMasukkan nama menu yang ingin diubah: ") 
                 if nama_menu in menu:
-                    print(f"\n| {nama_menu} ditemukan di daftar menu.\n") #jika nama menu yg ingin diubah ada pada dict menu maka akan muncul ini
-                    df = pd.read_csv("stand.csv") # ini var untuk membaca file standcsv
-                    hapus_menu_lama = df[df['Nama Menu'] != nama_menu] #di var ini akan dikumpulkan nama menu yang tidak sama dengan inputan pengguna
-                    hapus_menu_lama.to_csv("stand.csv", index=False)# kemudian var sblmnya akan akan diperbarui dan disimpan di stand csv
+                    print(f"\n| {nama_menu} ditemukan di daftar menu.\n") 
+                    df = pd.read_csv("stand.csv") 
+                    hapus_menu_lama = df[df['Nama Menu'] != nama_menu] 
+                    hapus_menu_lama.to_csv("stand.csv", index=False)
                     ubah = input("Apakah Anda ingin mengubah nama atau harga menu? (y untuk ya, b untuk batal): ").lower()
 
                     if ubah == 'y':
@@ -115,8 +115,8 @@ def kelola_menu(username_km): #kenapa pake usn_km, ini buat mastiin cuma menu mi
 
             if nama_menu in menu:
                 df = pd.read_csv("stand.csv")
-                hapus_menu_lama = df[df['Nama Menu'] != nama_menu]#akan dikumpulkan nama menu yg berbeda dr inputan pengguna
-                hapus_menu_lama.to_csv("stand.csv", index=False) #kemudian var tsb akan disimban ke stand csv dengan tidak menggunakan index
+                hapus_menu_lama = df[df['Nama Menu'] != nama_menu]
+                hapus_menu_lama.to_csv("stand.csv", index=False) 
                 print(f"{nama_menu} berhasil dihapus!")
             else:
                 print("\nMenu tidak ditemukan.")
@@ -136,13 +136,13 @@ def baca_data_orderan():
         return pd.DataFrame(columns=["Stand", "Nama Menu", "Jumlah", "Harga", "Status"])
 
 def tampilkan_pesanan_belum_diproses(stand):
-    df = baca_data_orderan() #Disini digunakan function baca data orderan untuk membaca orderan yg masuk
-    df_stand = df[(df["Stand"] == stand) & (df["Status"] == "Belum")] #di var ini dikumpulkan berdasarkan stand dan difilter statusnya yg belum, jd yg sudah gk akan masuk kesini
+    df = baca_data_orderan()
+    df_stand = df[(df["Stand"] == stand) & (df["Status"] == "Belum")] 
     
-    if df_stand.empty: #jika dfstand gak ada
+    if df_stand.empty: 
         print(f"\nTidak ada pesanan yang belum diproses.")
 
-    else:#jika ada maka akan memunculkan prin kemudian tabel yg berisi nama stand mereka, pesanan, jumlah, harga total dan status yg belum
+    else:
         print(f"\nPesanan belum diproses :")
     
     print(tabulate(df_stand, headers=["Nama stand", "Pesanan", "Jumlah", "Harga total", "Status"], tablefmt="fancy_grid"))
@@ -150,13 +150,13 @@ def tampilkan_pesanan_belum_diproses(stand):
 
 def ubah_status_pesanan(stand):
     df = baca_data_orderan()
-    df_stand = df[(df["Stand"] == stand) & (df["Status"] == "Belum")] #di var ini dikumpulkan berdasarkan stand dan difilter statusnya yg belum, jd yg sudah gk akan masuk kesini
+    df_stand = df[(df["Stand"] == stand) & (df["Status"] == "Belum")] 
 
     if df_stand.empty:
-        print(f"\nTidak ada pesanan yang belum diproses.") #kalo misal ternyata udah semua, atau gak ada orderan masuk atau file gak kebaca maka akan muncul ini
-        return #hasilnya kemudian direturn ke fungsi yg manggil dia
+        print(f"\nTidak ada pesanan yang belum diproses.") 
+        return 
 
-    print(f"\nPesanan belum diproses :")#kemudian disini diprint pesanan blm diproses dan hasilnya dari variabel df_stand
+    print(f"\nPesanan belum diproses :")
     print(tabulate(df_stand, headers=["No", "Nama stand", "Pesanan", "Jumlah", "Status"], tablefmt="fancy_grid"))
 
     try:
@@ -183,7 +183,7 @@ def tampilkan_arsip_pesanan(stand):
     print(tabulate(df_stand, headers=["Nama Stand","Pesanan","Jumlah", "Harga total", "status"], tablefmt="fancy_grid", showindex=False))
     input("\n(Enter untuk kembali.)")
 
-def kelola_orderan(username_ko): #kenapa pake usn_ko, ini buat mastiin cuma orderan milik penjual dgn nama stand yg sesuai yg dikelola
+def kelola_orderan(username_ko): 
     while True:
         header("Penjual > Kelola Orderan")
         print("[1] Lihat Pesanan Belum Diproses\n[2] Ubah Status Pesanan\n[3] Lihat Arsip Pesanan\n[4] Keluar")
