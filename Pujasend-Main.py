@@ -555,7 +555,7 @@ def voucher():
             else:
                 try:
                     banyak_diskon = int(input("Masukkan diskon: "))
-                    data_baru = {'Kode Voucher' : nama_voucher, 'Diskon (%)' : banyak_diskon}
+                    data_baru = {'kode voucher' : nama_voucher, 'diskon (%)' : banyak_diskon}
                     data_baru = pd.DataFrame([data_baru])  
                     voucher = pd.concat([voucher, data_baru], ignore_index=True)
                     voucher.to_csv('voucher.csv', index=False)
